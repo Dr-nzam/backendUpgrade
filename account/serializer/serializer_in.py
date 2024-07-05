@@ -35,6 +35,6 @@ class RefreshTokenSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         try:
-            RefreshToken(self.token).blacklist().adelete()
+            RefreshToken(self.token).blacklist()
         except TokenError:
             self.fail('bad_token')

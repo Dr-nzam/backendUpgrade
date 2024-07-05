@@ -57,10 +57,27 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'backendUgrade.urls'
 AUTH_USER_MODEL = 'account.CustomUser'
 
-REST_FRAMEWORK = { 
-    'DEFAULT_AUTHENTICATION_CLASSES' : ( 
-        'rest_framework_simplejwt.authentication.JWTAuthentication', 
-    ), 
+# REST_FRAMEWORK = { 
+#     'DEFAULT_AUTHENTICATION_CLASSES' : ( 
+#         'rest_framework_simplejwt.authentication.JWTAuthentication', 
+#     ), 
+# }
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    # 'SIMPLE_JWT': {
+    #     # 'TOKEN_BLACKLIST_ENABLED': True,
+    #     "AUTH_HEADER_TYPES": ("Bearer",),
+    #     "ACCESS_TOKEN_LIFETIME": timedelta(hours=48),
+    #     # 'USER_ID_FIELD': 'id',
+    #     # 'USER_ID_CLAIM': 'user_id',
+    #     # 'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    #     # 'TOKEN_TYPE_CLAIM': 'token_type',
+    #     # 'TOKEN_BLACKLIST_AFTER_ROTATION': True,
+    # },
 }
 
 
@@ -68,6 +85,7 @@ SITE_ID = 1
 
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Token",),
+    # "AUTH_HEADER_TYPES": ("Bearer",),
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=48)
 }
 

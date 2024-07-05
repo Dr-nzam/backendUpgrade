@@ -10,6 +10,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.generics import GenericAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -43,25 +45,41 @@ class ChangePasswordAPI(generics.UpdateAPIView):
             return Response("Success.", status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+
+
+# @permission_classes([IsAuthenticated])
+# @api_view(['GET'])
+# def infoUser(request):
+#     try:
+#         # Vérifier la validité du token
+#         jwt_value = JWTAuthentication().get_validated_token(request)
+#         user = CustomUser.objects.get(id=request.user.id)
+#         serializer = UserSerializer(user).data
+#         serializer["etat"] = 'connecté'
+#         return Response(serializer, status=status.HTTP_200_OK)
+#     except InvalidToken as e:
+#         return Response({'error': 'Token invalide'}, status=status.HTTP_401_UNAUTHORIZED)
+    
        
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def infoUser(request):
-    user = CustomUser.objects.get(id = request.user.id)
-    serializer = UserSerializer(user).data
-    serializer["etat"] = 'connecté'
-    return Response(serializer, status=status.HTTP_200_OK)
-
+    try:
+        print('*--**--*-*-*-*-**-*-****---*-*-*-*--*-*-')
+        print(JWTAuthentication().authenticate(request))
+        print('*--**--*-*-*-*-**-*-****---*-*-*-*--*-*-')
+        JWTAuthentication().authenticate(request)
+        user = CustomUser.objects.get(id = request.user.id)
+        serializer = UserSerializer(user).data
+        serializer["etat"] = 'connecté'
+        return Response(serializer, status=status.HTTP_200_OK)
+    except:
+        return Response("invalide token", status=status.HTTP_401_UNAUTHORIZED)
 
 @permission_classes([IsAuthenticated])
 class LogoutViewd(GenericAPIView):
-    # print('----------------------l---------pp----++------------------------------')
-    serializer_class = RefreshTokenSerializer(many=False)
-    print('----------------------l-;llll--------pp----++------------------------------')
-    # permission_classes = (permissions.IsAuthenticated)
-
     def post(self, request, *args):
-        print("******************************************************")
         sz = RefreshTokenSerializer(data=request.data, many=False)
         sz.is_valid(raise_exception=True)
         sz.save()
