@@ -1,6 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
+# from evaluation.models import Departement
+
+
+
+class Departement(models.Model):
+    nomDepartement  = models.CharField(max_length=128, default="", blank=True)  
+
+    def __str__(self):
+        return self.nomDepartement
+
 
 class UserManager(BaseUserManager):
 
@@ -33,11 +43,11 @@ class CustomUser(AbstractUser):
     email = models.EmailField(max_length=100, unique=True)
     number_phone = models.CharField(max_length=128, blank=True)
     otp = models.CharField(max_length=6, null=True, blank=True) 
-    # poste = models.CharField(max_length=128, default='')
-    departement = models.CharField(max_length=128, default='')
     first_name = models.CharField(max_length=128, default='')
     last_name = models.CharField(max_length=128, default='')
     note = models.IntegerField(default=0, blank=True)
+    departement = models.ForeignKey(Departement, on_delete=models.CASCADE,
+                                     blank=True, related_name='departement2', default= 1)
     date_joined = models.DateTimeField(auto_now_add=True)
     is_technician = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
@@ -54,6 +64,3 @@ class CustomUser(AbstractUser):
         return self.email
 
 
-# class Debit(models.Model):
-#     nom_debit = models.CharField(max_length=128, blank=True)
-#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='tot')
