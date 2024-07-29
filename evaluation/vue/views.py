@@ -4,10 +4,12 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from evaluation.models import Evaluation, Participe, Question, Departement, Reponse
-from evaluation.serializer.serializer_in import EvaluationSerializer, QuestionSerializer
+from evaluation.serializer.serializer_in import (EvaluationSerializer, ParticipeSerializer,
+                                                  QuestionSerializer, ParticipeSerializerOUT)
 from datetime import datetime
 import random
-
+import statistics 
+from django.db.models import Q
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -109,3 +111,72 @@ def validerReponse(request):
         return Response({"message":"bonne reponse"}, status=status.HTTP_200_OK)
     else:
         return Response({"message":"mauvaise reponse"}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def participe(request):
+    data = request.data
+    user = request.user
+    idEvent  = data.get('id_event')
+    idDepartement  = data.get('id_departement')
+    note = data.get('note')
+    if Participe.objects.filter(Q(user = user) & Q(evaluation =idEvent)).exists():
+        return Response({"messsage":"Vous avez deja participez"}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        dataInfo = {'evaluation': idEvent, 'user': user.id, 'departement':idDepartement, 'note':note }
+        serializer = ParticipeSerializer(data= dataInfo)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def statistique(request):
+    user = request.user
+    listNote = []
+    if user.is_admin:
+        participation = Participe.objects.all().order_by("-id")
+        evaluations = set(participation.values_list('evaluation', flat=True))
+        serializer = []
+        for evaluation in evaluations:
+            participation_evaluation = participation.filter(evaluation=evaluation)
+            listNote = [participe.note for participe in participation_evaluation]
+            listNote.sort()
+            moyenne = statistics.mean(listNote)
+            petiteNote = min(listNote)
+            premiereNote = max(listNote)
+            serializer.append({
+                "evaluation": evaluation,
+                "participations": ParticipeSerializerOUT(participation_evaluation, many=True).data,
+                "moyenne": moyenne,
+                "petite_note": petiteNote,
+                "premiereNote": premiereNote
+            })
+        return Response(serializer, status=status.HTTP_200_OK)
+    else:
+        participation = Participe.objects.filter(user=user.id).order_by("-id")
+        evaluations = set(participation.values_list('evaluation', flat=True))
+        serializer = []
+        for evaluation in evaluations:
+            participation_evaluation = participation.filter(evaluation=evaluation)
+            listNote = [participe.note for participe in participation_evaluation]
+            listNote.sort()
+            moyenne = statistics.mean(listNote)
+            petiteNote = min(listNote)
+            premiereNote = max(listNote)
+            serializer.append({
+                "evaluation": evaluation,
+                "participations": ParticipeSerializerOUT(participation_evaluation, many=True).data,
+                "moyenne": moyenne,
+                "petite_note": petiteNote,
+                "premiereNote": premiereNote
+            })
+        return Response(serializer, status=status.HTTP_200_OK)  
+    
+
+
+
+

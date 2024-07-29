@@ -21,11 +21,11 @@ class Evaluation(models.Model):
 class Participe(models.Model):
     evaluation = models.ForeignKey(Evaluation, on_delete=models.CASCADE, blank=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, related_name="participe")
-    Departement = models.ForeignKey(Departement, on_delete=models.CASCADE, blank=True, related_name="participede")
-    note = models.CharField(max_length=128, default="", blank=True)
+    departement = models.ForeignKey(Departement, on_delete=models.CASCADE, blank=True, related_name="participede")
+    note = models.FloatField(blank=True)
 
     def __str__(self):
-        return self.evaluation
+        return f"participation {self.evaluation}"
         
 
 class Question(models.Model):

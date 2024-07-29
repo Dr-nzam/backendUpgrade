@@ -6,6 +6,7 @@ from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
 from .models import CustomUser
 from rest_framework_simplejwt.views import TokenObtainPairView
+from evaluation.models import Participe
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -55,4 +56,15 @@ def infoUser(request):
     except:
         return Response("invalide token", status=status.HTTP_401_UNAUTHORIZED)
 
-    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def listeUser(request):
+    user = request.user
+    if user.is_admin:
+        userBD = CustomUser.objects.all()
+        serializer = UserSerializer(userBD, many = True).data
+        return Response (serializer, status =status.HTTP_200_OK)
+    else:
+        return Response({"messsage":"Vous n'avez pas les autorisations necessaire"},
+                         status=status.HTTP_400_BAD_REQUEST)
