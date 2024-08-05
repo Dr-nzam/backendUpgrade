@@ -9,10 +9,10 @@ def current_time():
 # Create your models here.
 class Evaluation(models.Model):
     nom = models.CharField(max_length=128, default="", blank=True)
-    dateDebut = models.DateField(max_length=128, default=date.today, blank=True)
-    dateFin = models.DateField(max_length=128, default=date.today, blank=True)
-    heureDebut = models.TimeField(max_length=128, default=current_time, blank=True)
-    heureFin = models.TimeField(max_length=128, default=current_time, blank=True)
+    dateDebut = models.CharField(max_length=128, default=date.today, blank=True)
+    dateFin = models.CharField(max_length=128, default=date.today, blank=True)
+    heureDebut = models.CharField(max_length=128, default=current_time, blank=True)
+    heureFin = models.CharField(max_length=128, default=current_time, blank=True)
     departement = models.ForeignKey(Departement, on_delete=models.CASCADE, blank=True, related_name='departement_eval')
 
     def __str__(self):

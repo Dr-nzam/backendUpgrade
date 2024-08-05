@@ -1,7 +1,7 @@
 from django.urls import path
 from evaluation.vue.views import (newEvaluation, listEvaluationFuture,
                                    historiqueEvaluation,genererQuestion, 
-                                   validerReponse, participe, statistique)
+                                   validerReponse, participe, statistique,listDepartement)
 
 urlpatterns = [
     path('create-evaluation/', newEvaluation, name='register-user'),
@@ -11,5 +11,5 @@ urlpatterns = [
     path('valider-question/', validerReponse, name='valider-reponse'),
     path('participer-evaluation/', participe, name='participer-evaluation'),
     path('statistique-evaluation/', statistique, name='statistique-evaluation'),
-    
+    path('list-departement/', listDepartement, name='list-departement'),
 ]

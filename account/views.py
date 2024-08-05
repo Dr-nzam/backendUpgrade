@@ -41,8 +41,8 @@ class ChangePasswordAPI(generics.UpdateAPIView):
             # set_password also hashes the password that the user will get
             self.object.set_password(serializer.data.get("new_password"))
             self.object.save()
-            return Response("Success.", status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message":"Success"}, status=status.HTTP_200_OK)
+        return Response({"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
 
 @permission_classes([IsAuthenticated])
