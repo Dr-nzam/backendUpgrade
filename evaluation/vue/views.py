@@ -30,6 +30,7 @@ def newEvaluation(request):
 @permission_classes([IsAuthenticated])
 def listEvaluationFuture(request):
     user = request.user
+    print(user.id)
     dateActuelle = datetime.now().date()
     listeEvaluations = []
     if user.is_admin:
@@ -42,10 +43,14 @@ def listEvaluationFuture(request):
         return Response(serializer, status=status.HTTP_200_OK)
     else:
         idDepartementUser = user.departement.id
+        print("*-*-*-**--**-*-*-*-*-**-")
+        print(idDepartementUser)
         departement = Departement.objects.get(id = idDepartementUser)
+        print (departement)
         evaluations = Evaluation.objects.filter(departement = departement.id).order_by("-id")
         for evaluation in evaluations:
-            if evaluation.dateDebut >= dateActuelle:
+            dateConvert = datetime.strptime(evaluation.dateDebut, "%d/%m/%Y").date()
+            if dateConvert >= dateActuelle:
                 listeEvaluations.append(evaluation)
         serializer = EvaluationSerializer(listeEvaluations, many=True).data
         return Response(serializer, status=status.HTTP_200_OK)
@@ -87,7 +92,7 @@ def genererQuestion(request):
     print(evaluations)
     if len(evaluations) != 0:
         for evaluation in evaluations:
-            questions = Question.objects.filter(evaluations = evaluation.id)
+            questions = Question.objects.filter(departement = departement.id)
             if len(questions)!=0:
                 for question in questions:
                     questionList.append(question)
@@ -184,9 +189,7 @@ def statistique(request):
 @api_view()
 @permission_classes([IsAuthenticated])
 def listDepartement(request):
-    user = request.user
-    if user.is_admin:
-        departement = Departement.objects.all()
-        serializer = DepartementSerializer(departement, many=True).data
-        return Response(serializer, status=status.HTTP_200_OK)
-    return Response({"message":"vous n'avez pas les droits"}, status=status.HTTP_200_OK)
+    departement = Departement.objects.all()
+    serializer = DepartementSerializer(departement, many=True).data
+    return Response(serializer, status=status.HTTP_200_OK)
+

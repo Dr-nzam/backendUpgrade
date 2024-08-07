@@ -14,12 +14,12 @@ def registerUser(request):
     user = request.user
     if user.is_admin:
         serializer = UserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    else:
-        return Response({"message":"vous n'est pas autorise a faire cette action"}, status=status.HTTP_400_BAD_REQUEST)
-
+        if serializer.is_valid():
+        # serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"message":"Vous n'etes pas autoriser"}, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     authentication_classes = [] 
@@ -61,10 +61,16 @@ def infoUser(request):
 @permission_classes([IsAuthenticated])
 def listeUser(request):
     user = request.user
+    search = request.GET.get('search', '')
     if user.is_admin:
-        userBD = CustomUser.objects.all()
-        serializer = UserSerializer(userBD, many = True).data
-        return Response (serializer, status =status.HTTP_200_OK)
-    else:
-        return Response({"messsage":"Vous n'avez pas les autorisations necessaire"},
-                         status=status.HTTP_400_BAD_REQUEST)
+        if search =='':
+            userBD = CustomUser.objects.all()
+            serializer = UserSerializer(userBD, many = True).data
+            print(serializer)
+            return Response (serializer, status =status.HTTP_200_OK)
+        else:
+            userBD = CustomUser.objects.filter(last_name__contains = search)
+            serializer = UserSerializer(userBD, many = True).data
+            return Response (serializer, status =status.HTTP_200_OK)
+            
+    return Response({"messsage":"Une erreur s'est produire"}, status=status.HTTP_400_BAD_REQUEST)
