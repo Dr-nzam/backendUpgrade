@@ -22,11 +22,11 @@ class ReponseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class QuestionSerializer(serializers.ModelSerializer):
-    evaluations = EvaluationSerializer()
-    reponse = ReponseSerializer(many=True, read_only=True)
+    departement = DepartementSerializer()
+    reponse = ReponseSerializer(read_only=True, many = True)
     class Meta:
         model = Question
-        fields = ['id','question','evaluations','reponse']
+        fields = ['id','question','departement', 'reponse']
 
 class ParticipeSerializer(serializers.ModelSerializer):
     class Meta:

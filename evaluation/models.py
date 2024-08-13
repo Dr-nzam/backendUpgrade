@@ -31,7 +31,7 @@ class Participe(models.Model):
 class Question(models.Model):
     question = models.CharField(max_length=128, default="", blank=True)
     # evaluations = models.ForeignKey(Evaluation, on_delete=models.CASCADE, blank=True, related_name='question')
-    Departement = models.ForeignKey(Departement, on_delete=models.CASCADE, blank=True, related_name='question')
+    departement = models.ForeignKey(Departement, on_delete=models.CASCADE, blank=True, related_name='question')
 
     def __str__(self):
         return self.question

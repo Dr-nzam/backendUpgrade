@@ -84,28 +84,19 @@ def historiqueEvaluation(request):
 def genererQuestion(request):
     user = request.user
     idDepartementUser = user.departement.id
-    # dateActuelle = datetime.now().date()
-    # heureActuelle = datetime.now().time()
     departement = Departement.objects.get(id = idDepartementUser)
-    evaluations = Evaluation.objects.filter(departement = departement.id)
     questionList = []
-    print(evaluations)
-    if len(evaluations) != 0:
-        for evaluation in evaluations:
-            questions = Question.objects.filter(departement = departement.id)
-            if len(questions)!=0:
-                for question in questions:
-                    questionList.append(question)
-            else:
-                return Response({"message": f"Aucune question n'est disponible pour l'evaluation {evaluation.nom}"},
-                         status=status.HTTP_400_BAD_REQUEST)
-        random.shuffle(questionList)
-        serializer = QuestionSerializer(questionList, many = True).data
-        return Response(serializer, status=status.HTTP_200_OK)
+    questions = Question.objects.filter(departement = departement.id)[:5]
+    if len(questions)!=0:
+        for question in questions:
+            questionList.append(question)
     else:
-        return Response({"message": f"Aucune evaluation n'est disponible pour le departement {departement.nomDepartement}"},
-                         status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response({"message": f"Aucune l'evaluation n'est disponible pour le departement: {departement.nomDepartement}"},
+            status=status.HTTP_400_BAD_REQUEST)
+    random.shuffle(questionList)
+    serializer = QuestionSerializer(questionList, many = True).data
+    return Response(serializer, status=status.HTTP_200_OK)
+   
 
 
 @api_view(["POST"])
