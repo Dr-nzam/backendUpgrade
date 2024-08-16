@@ -30,7 +30,6 @@ def newEvaluation(request):
 @permission_classes([IsAuthenticated])
 def listEvaluationFuture(request):
     user = request.user
-    print(user.id)
     dateActuelle = datetime.now().date()
     listeEvaluations = []
     if user.is_admin:
@@ -127,8 +126,8 @@ def participe(request):
         serializer = ParticipeSerializer(data= dataInfo)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message":serializer.data}, status=status.HTTP_201_CREATED)
+    return Response({"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -177,10 +176,19 @@ def statistique(request):
     
 
 
-@api_view()
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def listDepartement(request):
     departement = Departement.objects.all()
     serializer = DepartementSerializer(departement, many=True).data
     return Response(serializer, status=status.HTTP_200_OK)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def verifierParticipation(request, pk):
+    user = request.user.id
+    if Participe.objects.filter(Q(user = user) & Q(evaluation =pk)).exists():
+        return Response({"message":"Vous avez deja participez"}, status=status.HTTP_200_OK)
+    else:
+        return Response({"message":"Vous n'avez pas participez"}, status=status.HTTP_400_BAD_REQUEST)
