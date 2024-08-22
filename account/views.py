@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import CustomUser
 from rest_framework_simplejwt.views import TokenObtainPairView
 from evaluation.models import Participe
+from django.db.models import Q
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -69,7 +70,7 @@ def listeUser(request):
             print(serializer)
             return Response (serializer, status =status.HTTP_200_OK)
         else:
-            userBD = CustomUser.objects.filter(last_name__contains = search)
+            userBD = CustomUser.objects.filter(Q(last_name__contains = search) | Q(first_name__contains = search))
             serializer = UserSerializer(userBD, many = True).data
             return Response (serializer, status =status.HTTP_200_OK)
             

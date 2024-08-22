@@ -192,3 +192,26 @@ def verifierParticipation(request, pk):
         return Response({"message":"Vous avez deja participez"}, status=status.HTTP_200_OK)
     else:
         return Response({"message":"Vous n'avez pas participez"}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def suivis(request):
+    user = request.user
+    if (user.is_admin):
+        suivis = Participe.objects.all().order_by("-id")
+        serialiser = ParticipeSerializerOUT(suivis, many = True).data
+        return Response(serialiser, status=status.HTTP_200_OK)
+    else :
+        suivis = Participe.objects.filter(user = user.id)
+        serialiser = ParticipeSerializerOUT(suivis, many = True).data
+        return Response(serialiser, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def generaleSuivis(request, pk):
+    suivis = Participe.objects.filter(Q(user = pk))
+    for suivi in suivis:
+        print(suivi)
+    serialiser = ParticipeSerializerOUT(suivis, many = True).data
+    return Response(serialiser, status=status.HTTP_200_OK)
