@@ -4,8 +4,9 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from evaluation.models import Evaluation, Participe, Question, Departement, Reponse
-from evaluation.serializer.serializer_in import (DepartementSerializer, EvaluationSerializer, ParticipeSerializer,
-                                                  QuestionSerializer, ParticipeSerializerOUT)
+from evaluation.serializer.serializer_in import (DepartementSerializer, EvaluationSerializer,
+                                                  ParticipeSerializer,QuestionSerializer, 
+                                                  ParticipeSerializerOUT)
 from datetime import datetime
 import random
 import statistics 
@@ -83,12 +84,17 @@ def historiqueEvaluation(request):
 def genererQuestion(request):
     user = request.user
     idDepartementUser = user.departement.id
+    print('**********')
+    print(idDepartementUser)
     departement = Departement.objects.get(id = idDepartementUser)
+    print(departement)
     questionList = []
     questions = Question.objects.filter(departement = departement.id)[:5]
+    print(questions)
     if len(questions)!=0:
         for question in questions:
             questionList.append(question)
+    
     else:
         return Response({"message": f"Aucune l'evaluation n'est disponible pour le departement: {departement.nomDepartement}"},
             status=status.HTTP_400_BAD_REQUEST)
@@ -140,7 +146,7 @@ def statistique(request):
         evaluations = set(participation.values_list('evaluation', flat=True))
         serializer = []
         for evaluation in evaluations:
-            participation_evaluation = participation.filter(evaluation=evaluation)
+            participation_evaluation = participation.filter(evaluation=evaluation).order_by("-id")
             listNote = [participe.note for participe in participation_evaluation]
             listNote.sort()
             moyenne = statistics.mean(listNote)
@@ -159,7 +165,7 @@ def statistique(request):
         evaluations = set(participation.values_list('evaluation', flat=True))
         serializer = []
         for evaluation in evaluations:
-            participation_evaluation = participation.filter(evaluation=evaluation)
+            participation_evaluation = participation.filter(evaluation=evaluation).order_by("-id")
             listNote = [participe.note for participe in participation_evaluation]
             listNote.sort()
             moyenne = statistics.mean(listNote)
